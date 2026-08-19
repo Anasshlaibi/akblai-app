@@ -19,6 +19,8 @@
   },
   "homepage": "https://github.com/Anasshlaibi/akblai-app#readme",
   "dependencies": {
-    "@php-wasm/node": "^3.1.50"
+    "@php-wasm/node": "^3.1.50",
+    "@php-wasm/node-8-2": "^3.1.50",
+    "@php-wasm/universal": "^3.1.50"
   }
 }
