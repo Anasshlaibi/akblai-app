@@ -23,9 +23,16 @@ module.exports = async (req, res) => {
       method: req.method,
     });
 
+    let bodyText = '';
+    if (typeof response.stdout === 'string') {
+      bodyText = response.stdout;
+    } else if (response.stdout) {
+      bodyText = Buffer.from(response.stdout).toString('utf-8');
+    }
+
     res.statusCode = response.exitCode === 0 ? 200 : 500;
     res.setHeader('Content-Type', 'text/html; charset=utf-8');
-    res.end(response.stdout || response.stderr);
+    res.end(bodyText);
   } catch (err) {
     res.statusCode = 500;
     res.setHeader('Content-Type', 'text/plain');
