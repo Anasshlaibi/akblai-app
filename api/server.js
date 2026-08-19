@@ -9,6 +9,9 @@ let isMounted = false;
 async function getPHP() {
   if (!phpInstance) {
     const runtimeId = await loadNodeRuntime('8.2', {
+      phpIniEntries: {
+        include_path: '.:/app'
+      },
       emscriptenOptions: {
         processId: 1
       }
@@ -83,9 +86,6 @@ module.exports = async (req, res) => {
     const php = await getPHP();
     const result = await php.run({
       scriptPath: vfsScriptPath,
-      ini: {
-        include_path: '.:/app'
-      },
       env: {
         VERCEL: '1',
         DOCUMENT_ROOT: '/app',
