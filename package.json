@@ -1,0 +1,24 @@
+{
+  "name": "gestion_app_akabli",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Anasshlaibi/akblai-app.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/Anasshlaibi/akblai-app/issues"
+  },
+  "homepage": "https://github.com/Anasshlaibi/akblai-app#readme",
+  "dependencies": {
+    "@php-wasm/node": "^3.1.50"
+  }
+}
