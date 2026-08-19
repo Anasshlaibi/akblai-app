@@ -19,14 +19,14 @@ async function getPHP() {
   const rootDir = path.resolve(__dirname, '..');
   if (!isMounted) {
     try {
-      await phpInstance.mount('/var/task', createNodeFsMountHandler(rootDir));
+      await phpInstance.mount('/app', createNodeFsMountHandler(rootDir));
       isMounted = true;
     } catch (e) {
       // Mount already exists
     }
   }
 
-  phpInstance.chdir('/var/task');
+  phpInstance.chdir('/app');
   return phpInstance;
 }
 
@@ -62,7 +62,7 @@ module.exports = async (req, res) => {
       return res.status(200).send(fileBuffer);
     }
 
-    // 2. Determine target VFS script path
+    // 2. Determine target VFS script path inside /app
     let relativeScriptPath = urlPath;
     if (relativeScriptPath === '/' || relativeScriptPath === '') {
       relativeScriptPath = '/index.php';
@@ -78,17 +78,17 @@ module.exports = async (req, res) => {
       relativeScriptPath = '/index.php';
     }
 
-    const vfsScriptPath = path.join('/var/task', relativeScriptPath).replace(/\\/g, '/');
+    const vfsScriptPath = path.join('/app', relativeScriptPath).replace(/\\/g, '/');
 
     const php = await getPHP();
     const result = await php.run({
       scriptPath: vfsScriptPath,
       ini: {
-        include_path: '.:/var/task'
+        include_path: '.:/app'
       },
       env: {
         VERCEL: '1',
-        DOCUMENT_ROOT: '/var/task',
+        DOCUMENT_ROOT: '/app',
         SCRIPT_FILENAME: vfsScriptPath,
         HTTP_HOST: req.headers.host || 'akblai-app.vercel.app',
         REQUEST_URI: req.url || '/',
