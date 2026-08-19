@@ -1,11 +1,20 @@
 <?php
+ini_set('display_errors', '1');
+ini_set('display_startup_errors', '1');
+error_reporting(E_ALL & ~E_DEPRECATED & ~E_NOTICE);
+
 // Set working directory to project root
 chdir(dirname(__DIR__));
 
-// Get requested URI path
 $uri = parse_url($_SERVER['REQUEST_URI'] ?? '/', PHP_URL_PATH);
 
-// Normalize path
+// Setup SERVER variables for Dolibarr routing
+$_SERVER['DOCUMENT_ROOT'] = str_replace('\\', '/', dirname(__DIR__));
+$script = ($uri === '/' || empty($uri)) ? '/index.php' : $uri;
+$_SERVER['SCRIPT_FILENAME'] = $_SERVER['DOCUMENT_ROOT'] . $script;
+$_SERVER['SCRIPT_NAME'] = $script;
+$_SERVER['PHP_SELF'] = $script;
+
 if ($uri === '/' || $uri === '' || empty($uri)) {
     require dirname(__DIR__) . '/index.php';
     exit;
