@@ -10,12 +10,29 @@ async function getPHP() {
   return phpInstance;
 }
 
+function parseOutput(output) {
+  if (typeof output === 'string') return output;
+  if (!output) return '';
+  if (output instanceof Uint8Array || Buffer.isBuffer(output)) {
+    return Buffer.from(output).toString('utf-8');
+  }
+  if (Array.isArray(output)) {
+    return String.fromCharCode.apply(null, output);
+  }
+  return String(output);
+}
+
 module.exports = async (req, res) => {
   try {
     const php = await getPHP();
     const url = req.url || '/';
     const rootDir = path.resolve(__dirname, '..');
-    const targetScript = path.join(rootDir, url === '/' ? 'index.php' : url.split('?')[0]);
+    
+    let relPath = url.split('?')[0];
+    if (relPath === '/' || relPath === '') {
+        relPath = '/index.php';
+    }
+    const targetScript = path.join(rootDir, relPath);
 
     const response = await php.run({
       scriptPath: targetScript,
@@ -23,12 +40,7 @@ module.exports = async (req, res) => {
       method: req.method,
     });
 
-    let rawOutput = '';
-    if (typeof response.stdout === 'string') {
-      rawOutput = response.stdout;
-    } else if (response.stdout) {
-      rawOutput = Buffer.from(response.stdout).toString('utf-8');
-    }
+    const rawOutput = parseOutput(response.stdout);
 
     // Separate CGI HTTP headers from HTML body
     let headersStr = '';
