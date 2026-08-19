@@ -80,10 +80,22 @@ module.exports = async (req, res) => {
     const relativeDir = path.dirname(relativeScriptPath).replace(/\\/g, '/');
     const vfsScriptDir = path.join('/app', relativeDir).replace(/\\/g, '/');
     const vfsScriptPath = path.join('/app', relativeScriptPath).replace(/\\/g, '/');
+    const hostHeader = req.headers.host || 'akblai-app.vercel.app';
+    const requestUri = req.url || '/';
 
     const php = await getPHP();
     const result = await php.run({
       code: `<?php
+        $_SERVER['DOCUMENT_ROOT'] = '/app';
+        $_SERVER['HTTP_HOST'] = '${hostHeader}';
+        $_SERVER['REQUEST_URI'] = '${requestUri}';
+        $_SERVER['PHP_SELF'] = '${relativeScriptPath}';
+        $_SERVER['SCRIPT_NAME'] = '${relativeScriptPath}';
+        $_SERVER['SCRIPT_FILENAME'] = '${vfsScriptPath}';
+        $_SERVER['SERVER_NAME'] = '${hostHeader}';
+        $_SERVER['SERVER_PORT'] = '443';
+        $_SERVER['HTTPS'] = 'on';
+
         ini_set('include_path', '.:${vfsScriptDir}:/app');
         chdir('${vfsScriptDir}');
         require '${vfsScriptPath}';
@@ -92,8 +104,8 @@ module.exports = async (req, res) => {
         VERCEL: '1',
         DOCUMENT_ROOT: '/app',
         SCRIPT_FILENAME: vfsScriptPath,
-        HTTP_HOST: req.headers.host || 'akblai-app.vercel.app',
-        REQUEST_URI: req.url || '/',
+        HTTP_HOST: hostHeader,
+        REQUEST_URI: requestUri,
         REMOTE_ADDR: req.headers['x-forwarded-for'] || '127.0.0.1'
       }
     });
