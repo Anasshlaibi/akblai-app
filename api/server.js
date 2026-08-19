@@ -9,9 +9,6 @@ let isMounted = false;
 async function getPHP() {
   if (!phpInstance) {
     const runtimeId = await loadNodeRuntime('8.2', {
-      phpIniEntries: {
-        include_path: '.:/app'
-      },
       emscriptenOptions: {
         processId: 1
       }
@@ -29,7 +26,6 @@ async function getPHP() {
     }
   }
 
-  phpInstance.chdir('/app');
   return phpInstance;
 }
 
@@ -81,11 +77,17 @@ module.exports = async (req, res) => {
       relativeScriptPath = '/index.php';
     }
 
+    const relativeDir = path.dirname(relativeScriptPath).replace(/\\/g, '/');
+    const vfsScriptDir = path.join('/app', relativeDir).replace(/\\/g, '/');
     const vfsScriptPath = path.join('/app', relativeScriptPath).replace(/\\/g, '/');
 
     const php = await getPHP();
     const result = await php.run({
-      scriptPath: vfsScriptPath,
+      code: `<?php
+        ini_set('include_path', '.:${vfsScriptDir}:/app');
+        chdir('${vfsScriptDir}');
+        require '${vfsScriptPath}';
+      `,
       env: {
         VERCEL: '1',
         DOCUMENT_ROOT: '/app',
