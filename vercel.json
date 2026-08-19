@@ -1,4 +1,9 @@
 {
+  "functions": {
+    "api/server.js": {
+      "includeFiles": "**"
+    }
+  },
   "routes": [
     {
       "src": "/(.*)",
