@@ -1,0 +1,6 @@
+documents/temp/*
+documents/admin/backup/*
+node_modules/
+.vercel/
+.env
+.env.local
