@@ -83,6 +83,9 @@ module.exports = async (req, res) => {
     const php = await getPHP();
     const result = await php.run({
       scriptPath: vfsScriptPath,
+      ini: {
+        include_path: '.:/var/task'
+      },
       env: {
         VERCEL: '1',
         DOCUMENT_ROOT: '/var/task',
